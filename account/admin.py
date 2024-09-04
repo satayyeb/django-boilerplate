@@ -7,6 +7,7 @@ from account.models.base import CustomUser, Organization, Otp, OrganizationInvit
 class CustomUserAdmin(admin.ModelAdmin):
     list_display = ['email', 'phone_number', 'first_name', 'last_name', 'verified_email', 'verified_phone']
     search_fields = ['email', 'first_name', 'last_name']
+    readonly_fields = ['uuid']
 
     def save_model(self, request, obj, form, change):
         # Hash the password on creating new user:
@@ -19,18 +20,22 @@ class CustomUserAdmin(admin.ModelAdmin):
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ['name', 'owner', 'balance']
+    readonly_fields = ['uuid']
 
 
 @admin.register(Otp)
 class OtpAdmin(admin.ModelAdmin):
     list_display = ['user']
+    readonly_fields = ['uuid']
 
 
 @admin.register(OrganizationInvite)
 class OrganizationInviteAdmin(admin.ModelAdmin):
     list_display = ['organization', 'email', 'status']
+    readonly_fields = ['uuid']
 
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
     list_display = ['organization', 'user', 'amount', 'status']
+    readonly_fields = ['uuid']

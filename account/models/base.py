@@ -6,13 +6,12 @@ from django.db import models
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import gettext_lazy as _
-from django_cryptography.fields import encrypt
 
 from account.models.managers import BaseModelManager, CustomUserManager
 
 
 class BaseModel(models.Model):
-    uuid = models.UUIDField()
+    uuid = models.UUIDField(default=uuid.uuid4)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
@@ -36,8 +35,8 @@ class CustomUser(AbstractUser, BaseModel):
     email = models.EmailField(_('Email address'), unique=True)
     phone_number = models.CharField(_("Phone number"), max_length=11, blank=True)
 
-    first_name = models.CharField(_("First name"), max_length=150)
-    last_name = models.CharField(_("Last name"), max_length=150)
+    first_name = models.CharField(_("First name"), max_length=150, blank=True)
+    last_name = models.CharField(_("Last name"), max_length=150, blank=True)
 
     verified_email = models.BooleanField(_('Verified email'), default=False)
     verified_phone = models.BooleanField(_('Verified phone number'), default=False)
@@ -52,7 +51,6 @@ class CustomUser(AbstractUser, BaseModel):
 
 
 class Organization(BaseModel):
-    uuid = models.UUIDField(default=uuid.uuid4)
     name = models.CharField(_('Name'), max_length=256)
     owner = models.ForeignKey(CustomUser, on_delete=models.PROTECT, related_name='organizations')
     balance = models.BigIntegerField(_('Balance'), default=0)
@@ -67,7 +65,7 @@ class Organization(BaseModel):
 
 class Otp(BaseModel):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    token = encrypt(models.CharField(_('token'), max_length=8))
+    token = models.CharField(_('token'), max_length=8)
     expiration_date = models.DateTimeField(_('Expiration date'))
 
     @classmethod
@@ -104,7 +102,7 @@ class Payment(BaseModel):
         ('paid', 'Paid'),
     ]
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.CASCADE)
     amount = models.BigIntegerField(_('Amount'), )
     status = models.CharField(_('Status'), max_length=16, choices=STATUS_CHOICES, default='pending')
     authority_data = models.JSONField(_('Authority data'), blank=True, default=dict)
