@@ -1,6 +1,6 @@
 ## A basic Django boilerplate project
 
-#### You can use this models in the `account` app:
+#### You can use these models in the `account` app:
 - Organization
 - OrganizationInvite
 - CustomUser
